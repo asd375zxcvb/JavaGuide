@@ -1,3 +1,8 @@
+---
+title: High Quality Technical Articles
+description: Curated non-technical growth and career articles for developers.
+---
+
 # 程序人生
 
 <!-- @include: @small-advertisement.snippet.md -->
