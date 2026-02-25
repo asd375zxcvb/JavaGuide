@@ -2,7 +2,10 @@ import { viteBundler } from "@vuepress/bundler-vite";
 import { defineUserConfig } from "vuepress";
 import theme from "./theme.js";
 
+const base = process.env.VUEPRESS_BASE ?? "/";
+
 export default defineUserConfig({
+  base,
   dest: "./dist",
 
   title: "JavaGuide",
