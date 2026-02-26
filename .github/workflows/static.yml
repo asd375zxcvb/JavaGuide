@@ -1,4 +1,4 @@
-name: Deploy Static Site
+name: Deploy Docs (Astro)
 
 on:
   push:
@@ -25,37 +25,42 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: docs/pnpm-lock.yaml
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Resolve VuePress base
+      - name: Resolve Astro site/base
         shell: bash
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
           OWNER="${GITHUB_REPOSITORY_OWNER}"
           if [ "$REPO_NAME" = "${OWNER}.github.io" ]; then
-            echo "VUEPRESS_BASE=/" >> "$GITHUB_ENV"
+            echo "ASTRO_BASE=/" >> "$GITHUB_ENV"
+            echo "ASTRO_SITE=https://${OWNER}.github.io" >> "$GITHUB_ENV"
           else
-            echo "VUEPRESS_BASE=/${REPO_NAME}/" >> "$GITHUB_ENV"
+            echo "ASTRO_BASE=/${REPO_NAME}/" >> "$GITHUB_ENV"
+            echo "ASTRO_SITE=https://${OWNER}.github.io/${REPO_NAME}" >> "$GITHUB_ENV"
           fi
 
       - name: Install dependencies
+        working-directory: docs
         run: pnpm install --frozen-lockfile
 
       - name: Build docs
+        working-directory: docs
         env:
-          NODE_OPTIONS: --max_old_space_size=4096
-          VUEPRESS_BASE: ${{ env.VUEPRESS_BASE }}
-        run: pnpm docs:build
+          ASTRO_BASE: ${{ env.ASTRO_BASE }}
+          ASTRO_SITE: ${{ env.ASTRO_SITE }}
+        run: pnpm build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
